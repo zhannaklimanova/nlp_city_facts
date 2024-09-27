@@ -4,15 +4,14 @@ import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from nltk.util import ngrams
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 from sklearn.linear_model import LogisticRegression, Perceptron
 from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.metrics import accuracy_score
 
-BINARY_FEATURES = False
+BINARY_FEATURES = True
 
 def first_preprocessing(text):
     stop_words = set(stopwords.words('english'))
@@ -24,6 +23,8 @@ def first_preprocessing(text):
     preprocessed_text = re.sub(r"\.\s", " ", preprocessed_text) # remove period followed by whitespace
     preprocessed_text = re.sub(r"\.$", "", preprocessed_text) # remove period at the end of the text
     preprocessed_text = re.sub(r'\s+', ' ', preprocessed_text).strip() # remove extra whitespaces
+    # Example: The sentence “Can’t won’t NYC’s 0.54.” is transformed into “cannot will not nyc 0.54” after the nine previous preprocessing steps.
+
     individual_words = RegexpTokenizer(r'\d+\.\d+|\w+(?:-\w+)*').tokenize(preprocessed_text) # split text into individual tokens
     filtered_words = [word for word in individual_words if word not in stop_words] # remove stopwords
 
@@ -157,7 +158,7 @@ def train_and_select_best_hyperparameters(X_train, y_train, X_valid, y_valid, bi
                     best_naive_bayes_params = {'var_smoothing': var_smoothing}
             valid_accuracy = best_naive_bayes_accuracy
 
-    perceptron_params = {'penalty': ['l1', 'l2', None], 'alpha': [0.001, 0.01, 0.1, 1]}
+    perceptron_params = {'penalty': ['l1', 'l2', None], 'alpha': [0.001, 0.01, 0.1, 1.0]}
     if use_cross_validation:
         perceptron = Perceptron(max_iter=max_iterations)
         grid_perceptron = GridSearchCV(perceptron, perceptron_params, cv=k_folds)
@@ -180,12 +181,7 @@ def train_and_select_best_hyperparameters(X_train, y_train, X_valid, y_valid, bi
                     best_perceptron_params = {'penalty': penalty, 'alpha': alpha}
         valid_accuracy = best_validation_accuracy
 
-    linear_svc_params = {
-        'C': [0.001, 0.01, 0.1],
-        'penalty': ['l2'],
-        'loss': ['hinge', 'squared_hinge']
-    }
-
+    linear_svc_params = {'C': [0.001, 0.01, 0.1], 'loss': ['hinge', 'squared_hinge']}
     if use_cross_validation:
         svm = LinearSVC(max_iter=max_iterations)
         grid_svm = GridSearchCV(svm, linear_svc_params, cv=k_folds)
@@ -224,7 +220,7 @@ def train_and_select_best_hyperparameters(X_train, y_train, X_valid, y_valid, bi
 def test_best_models(results, X_test, y_test):
     test_accuracies = {}
 
-    for model, params, valid_acc in results:
+    for model, params, _ in results:
         y_pred_test = model.predict(X_test)
         test_accuracy = accuracy_score(y_test, y_pred_test)
         model_name = model.__class__.__name__
@@ -242,7 +238,9 @@ if __name__ == "__main__":
         real_facts = real_facts_file.readlines()
         fake_facts = fake_facts_file.readlines()
 
-    ### PREPROCESS ###
+    ##################################################
+    ############### PREPROCESSING STEP ###############
+    ##################################################
     feature_vector = set()
     num_real_facts = len(real_facts)
     num_fake_facts = len(fake_facts)
@@ -276,11 +274,15 @@ if __name__ == "__main__":
 
     print(X.shape, y.shape)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
+    X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.2, random_state=42, shuffle=True)
 
-    ### TRAIN ###
-    results = train_and_select_best_hyperparameters(X_train, y_train, X_valid, y_valid, BINARY_FEATURES, use_cross_validation=True)
+    ##################################################
+    ############### TRAINING STEP ###############
+    ##################################################
+    results = train_and_select_best_hyperparameters(X_train, y_train, X_valid, y_valid, BINARY_FEATURES, use_cross_validation=False)
 
-    ### TEST ###
+    ##################################################
+    ############### TESTING STEP ###############
+    ##################################################
     test_accuracies = test_best_models(results, X_test, y_test)
