@@ -1,12 +1,14 @@
-klizha => ~/Developer/NLP/nlp_city_facts $ python3
+$ python3
 Python 3.11.3 (v3.11.3:f3909b8bc8, Apr  4 2023, 20:12:10) [Clang 13.0.0 (clang-1300.0.29.30)] on darwin
 
-klizha => ~/Developer/NLP/nlp_city_facts $ python3 -m venv .venv
+$ python3 -m venv .venv
 
-klizha => ~/Developer/NLP/nlp_city_facts $ source .venv/bin/activate
-(.venv) klizha => ~/Developer/NLP/nlp_city_facts $ which python
+$ source .venv/bin/activate
+
+(.venv) $ which python
 /Users/klizha/Developer/NLP/nlp_city_facts/.venv/bin/python
-(.venv) klizha => ~/Developer/NLP/nlp_city_facts $ python3 -m pip install --upgrade pip
+
+(.venv) $ python3 -m pip install --upgrade pip
 Requirement already satisfied: pip in ./.venv/lib/python3.11/site-packages (22.3.1)
 Collecting pip
   Downloading pip-24.2-py3-none-any.whl (1.8 MB)
@@ -18,10 +20,10 @@ Installing collected packages: pip
       Successfully uninstalled pip-22.3.1
 Successfully installed pip-24.2
 
-(.venv) klizha => ~/Developer/NLP/nlp_city_facts $ python3 -m pip --version
+(.venv) $ python3 -m pip --version
 pip 24.2 from /Users/klizha/Developer/NLP/nlp_city_facts/.venv/lib/python3.11/site-packages/pip (python 3.11)
 
-(.venv) klizha => ~/Developer/NLP/nlp_city_facts $ pip3 install -r requirements.txt
+(.venv) $ pip3 install -r requirements.txt
 Collecting nltk==3.9.1 (from -r requirements.txt (line 1))
   Downloading nltk-3.9.1-py3-none-any.whl.metadata (2.9 kB)
 Collecting numpy==2.1.1 (from -r requirements.txt (line 2))
@@ -56,4 +58,4 @@ Downloading tqdm-4.66.5-py3-none-any.whl (78 kB)
 Installing collected packages: tqdm, threadpoolctl, regex, numpy, joblib, click, scipy, nltk, scikit-learn
 Successfully installed click-8.1.7 joblib-1.4.2 nltk-3.9.1 numpy-2.1.1 regex-2024.9.11 scikit-learn-1.5.2 scipy-1.14.1 threadpoolctl-3.5.0 tqdm-4.66.5
 
-(.venv) klizha => ~/Developer/NLP/nlp_city_facts $ python3 -m pip freeze > requirements.lock
+(.venv) $ python3 -m pip freeze > requirements.lock
